@@ -1,3 +1,6 @@
+target/
+dependency-reduced-pom.xml
+
 # Compiled class file
 *.class
 
@@ -29,9 +32,27 @@ replay_pid*
 *.iml
 *.iws
 *.list
+*.ipr
 
 # VSCode
 .vscode/
 
 # Mac
 .DS_Store
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### NetBeans ###
+/nbproject/private/
+/build/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
