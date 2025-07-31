@@ -13,6 +13,7 @@ import ru.otus.hw.domain.Question;
 
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @DisplayName("Test service testing")
@@ -63,5 +64,7 @@ class TestServiceImplTest {
         verify(ioService).printFormattedLine("  %d. %s", 1, "Answer A");
         verify(ioService).printFormattedLine("  %d. %s", 2, "Answer B");
         verify(ioService).printFormattedLine("  %d. %s", 3, "Answer C");
+
+        verifyNoMoreInteractions(ioService, questionDao);
     }
 } 
