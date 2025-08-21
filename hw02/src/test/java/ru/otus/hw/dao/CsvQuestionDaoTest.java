@@ -1,16 +1,16 @@
 package ru.otus.hw.dao;
 
-import org.junit.jupiter.api.BeforeEach;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import ru.otus.hw.config.TestFileNameProvider;
 import ru.otus.hw.domain.Answer;
 import ru.otus.hw.domain.Question;
 import ru.otus.hw.exceptions.QuestionReadException;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -20,23 +20,20 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @DisplayName("Тест для CsvQuestionDao")
+@ExtendWith(MockitoExtension.class)
 class CsvQuestionDaoTest {
 
     @Mock
     private TestFileNameProvider fileNameProvider;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
+    @InjectMocks
+    private CsvQuestionDao dao;
 
     @DisplayName("Корректно парсит вопросы из CSV файла")
     @Test
     void shouldParseQuestionsFromCsvFile() {
         when(fileNameProvider.getTestFileName()).thenReturn("questions.csv");
-        
-        CsvQuestionDao dao = new CsvQuestionDao(fileNameProvider);
-        
+
         List<Question> questions = dao.findAll();
         
         assertThat(questions).isNotEmpty();
@@ -56,9 +53,7 @@ class CsvQuestionDaoTest {
     @Test
     void shouldThrowExceptionWhenFileNotFound() {
         when(fileNameProvider.getTestFileName()).thenReturn("nonexistent.csv");
-        
-        CsvQuestionDao dao = new CsvQuestionDao(fileNameProvider);
-        
+
         assertThatThrownBy(dao::findAll)
                 .isInstanceOf(QuestionReadException.class)
                 .hasMessageContaining("Failed to read questions from file:");

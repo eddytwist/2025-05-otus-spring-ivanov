@@ -1,17 +1,17 @@
 package ru.otus.hw.service;
 
-import org.junit.jupiter.api.BeforeEach;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import ru.otus.hw.dao.QuestionDao;
 import ru.otus.hw.domain.Answer;
 import ru.otus.hw.domain.Question;
 import ru.otus.hw.domain.Student;
 import ru.otus.hw.domain.TestResult;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -22,6 +22,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @DisplayName("Тест для TestServiceImpl")
+@ExtendWith(MockitoExtension.class)
 class TestServiceImplTest {
 
     @Mock
@@ -30,13 +31,8 @@ class TestServiceImplTest {
     @Mock
     private QuestionDao questionDao;
 
+    @InjectMocks
     private TestServiceImpl testService;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        testService = new TestServiceImpl(ioService, questionDao);
-    }
 
     @DisplayName("Корректно выполняет тест для студента")
     @Test
