@@ -29,7 +29,6 @@ public class TestServiceImpl implements TestService {
         return testResult;
     }
 
-    // нужно также локализовать ответы
     private boolean askQuestion(ru.otus.hw.domain.Question question) {
         ioService.printLine("");
         ioService.printLine(question.text());
@@ -39,8 +38,8 @@ public class TestServiceImpl implements TestService {
         }
 
         int userAnswer = ioService.readIntForRangeWithPrompt(1, answers.size(),
-                "Please enter answer number (1-" + answers.size() + "):",
-                "Invalid answer number. Please enter number from 1 to " + answers.size());
+                ioService.getMessage("TestService.enter.answer.number", answers.size()),
+                ioService.getMessage("TestService.invalid.answer.number", answers.size()));
 
         return answers.get(userAnswer - 1).isCorrect();
     }

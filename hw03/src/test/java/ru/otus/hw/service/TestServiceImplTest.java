@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 class TestServiceImplTest {
 
     @Mock
-    private IOService ioService;
+    private LocalizedIOService ioService;
 
     @Mock
     private QuestionDao questionDao;
@@ -55,6 +55,7 @@ class TestServiceImplTest {
         );
 
         when(questionDao.findAll()).thenReturn(questions);
+        mockGetMessage();
         when(ioService.readIntForRangeWithPrompt(anyInt(), anyInt(), anyString(), anyString()))
                 .thenReturn(1) // первый вопрос - правильный ответ (индекс 1)
                 .thenReturn(2); // второй вопрос - правильный ответ (индекс 2)
@@ -67,7 +68,7 @@ class TestServiceImplTest {
         assertThat(result.getAnsweredQuestions()).hasSize(2);
         assertThat(result.getRightAnswersCount()).isEqualTo(2);
 
-        verify(ioService, times(1)).printFormattedLine("Please answer the questions below%n");
+        verify(ioService, times(1)).printLineLocalized("TestService.answer.the.questions");
         verify(ioService, times(5)).printLine(anyString()); // 1 пустая строка в начале + 2 пустые строки перед вопросами + 2 текста вопросов
         verify(ioService, times(4)).printFormattedLine(anyString(), anyInt(), anyString()); // варианты ответов
         verify(ioService, times(2)).readIntForRangeWithPrompt(anyInt(), anyInt(), anyString(), anyString()); // 2 вопроса
@@ -92,6 +93,7 @@ class TestServiceImplTest {
         );
 
         when(questionDao.findAll()).thenReturn(questions);
+        mockGetMessage();
         when(ioService.readIntForRangeWithPrompt(anyInt(), anyInt(), anyString(), anyString()))
                 .thenReturn(2); // выбираем неправильный ответ (индекс 2)
 
@@ -100,5 +102,18 @@ class TestServiceImplTest {
 
         // then
         assertThat(result.getRightAnswersCount()).isEqualTo(0);
+    }
+
+    private void mockGetMessage() {
+        when(ioService.getMessage(anyString(), anyInt())).thenAnswer(invocation -> {
+            String code = invocation.getArgument(0);
+            int size = invocation.getArgument(1);
+            if (code.equals("TestService.enter.answer.number")) {
+                return "Please enter answer number (1-" + size + "):";
+            } else if (code.equals("TestService.invalid.answer.number")) {
+                return "Invalid answer number. Please enter number from 1 to " + size;
+            }
+            return "";
+        });
     }
 }
