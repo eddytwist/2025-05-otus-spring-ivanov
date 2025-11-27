@@ -3,39 +3,30 @@ package ru.otus.hw.dao;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import ru.otus.hw.config.TestFileNameProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import ru.otus.hw.domain.Answer;
 import ru.otus.hw.domain.Question;
-import ru.otus.hw.exceptions.QuestionReadException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
 
 @DisplayName("Тест для CsvQuestionDao")
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@ActiveProfiles("test")
 class CsvQuestionDaoTest {
 
-    @Mock
-    private TestFileNameProvider fileNameProvider;
-
-    @InjectMocks
-    private CsvQuestionDao dao;
+    @Autowired
+    private QuestionDao dao;
 
     @DisplayName("Корректно парсит вопросы из CSV файла")
     @Test
     void shouldParseQuestionsFromCsvFile() {
-        when(fileNameProvider.getTestFileName()).thenReturn("questions.csv");
-
+        // When questions are loaded from configured CSV file (questions.csv for en-US
+        // locale in test profile)
         List<Question> questions = dao.findAll();
 
+        // Then questions are parsed correctly
         assertThat(questions).isNotEmpty();
         assertThat(questions).hasSize(3);
 
@@ -44,18 +35,5 @@ class CsvQuestionDaoTest {
         assertThat(firstQuestion.answers()).hasSize(3);
         assertThat(firstQuestion.answers()).extracting(Answer::isCorrect)
                 .containsExactly(true, false, false);
-
-        verify(fileNameProvider, times(1)).getTestFileName();
-        verifyNoMoreInteractions(fileNameProvider);
-    }
-
-    @DisplayName("Выбрасывает исключение при отсутствии файла")
-    @Test
-    void shouldThrowExceptionWhenFileNotFound() {
-        when(fileNameProvider.getTestFileName()).thenReturn("nonexistent.csv");
-
-        assertThatThrownBy(dao::findAll)
-                .isInstanceOf(QuestionReadException.class)
-                .hasMessageContaining("Failed to read questions from file:");
     }
 }

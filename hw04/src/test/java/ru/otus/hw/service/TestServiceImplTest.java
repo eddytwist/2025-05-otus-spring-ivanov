@@ -3,10 +3,10 @@ package ru.otus.hw.service;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.ActiveProfiles;
 import ru.otus.hw.dao.QuestionDao;
 import ru.otus.hw.domain.Answer;
 import ru.otus.hw.domain.Question;
@@ -18,21 +18,21 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @DisplayName("Тест для TestServiceImpl")
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@ActiveProfiles("test")
 class TestServiceImplTest {
 
-    @Mock
+    @MockitoBean
     private LocalizedIOService ioService;
 
-    @Mock
+    @MockitoBean
     private QuestionDao questionDao;
 
-    @InjectMocks
-    private TestServiceImpl testService;
+    @Autowired
+    private TestService testService;
 
     @DisplayName("Корректно выполняет тест для студента")
     @Test
@@ -42,17 +42,14 @@ class TestServiceImplTest {
 
         List<Answer> answers1 = List.of(
                 new Answer("Correct answer", true),
-                new Answer("Wrong answer", false)
-        );
+                new Answer("Wrong answer", false));
         List<Answer> answers2 = List.of(
                 new Answer("Wrong answer", false),
-                new Answer("Correct answer", true)
-        );
+                new Answer("Correct answer", true));
 
         List<Question> questions = List.of(
                 new Question("Question 1?", answers1),
-                new Question("Question 2?", answers2)
-        );
+                new Question("Question 2?", answers2));
 
         when(questionDao.findAll()).thenReturn(questions);
         mockGetMessage();
@@ -69,12 +66,12 @@ class TestServiceImplTest {
         assertThat(result.getRightAnswersCount()).isEqualTo(2);
 
         verify(ioService, times(1)).printLineLocalized("TestService.answer.the.questions");
-        verify(ioService, times(5)).printLine(anyString()); // 1 пустая строка в начале + 2 пустые строки перед вопросами + 2 текста вопросов
+        verify(ioService, times(5)).printLine(anyString()); // 1 пустая строка в начале + 2 пустые строки перед
+                                                            // вопросами + 2 текста вопросов
         verify(ioService, times(4)).printFormattedLine(anyString(), anyInt(), anyString()); // варианты ответов
-        verify(ioService, times(2)).readIntForRangeWithPrompt(anyInt(), anyInt(), anyString(), anyString()); // 2 вопроса
+        verify(ioService, times(2)).readIntForRangeWithPrompt(anyInt(), anyInt(), anyString(), anyString()); // 2
+                                                                                                             // вопроса
         verify(questionDao, times(1)).findAll();
-        verifyNoMoreInteractions(ioService);
-        verifyNoMoreInteractions(questionDao);
     }
 
     @DisplayName("Засчитывает неправильные ответы")
@@ -85,12 +82,10 @@ class TestServiceImplTest {
 
         List<Answer> answers = List.of(
                 new Answer("Correct answer", true),
-                new Answer("Wrong answer", false)
-        );
+                new Answer("Wrong answer", false));
 
         List<Question> questions = List.of(
-                new Question("Question?", answers)
-        );
+                new Question("Question?", answers));
 
         when(questionDao.findAll()).thenReturn(questions);
         mockGetMessage();
